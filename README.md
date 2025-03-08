@@ -1,3 +1,7 @@
+# scalable-url-shortener
+
+Scalable URL Shortener is a high-performance web app that shortens long URLs and tracks analytics. It features rate limiting, Redis caching, JWT authentication, and async analytics processing with RabbitMQ. Built with Node.js, PostgreSQL, and Kubernetes, it ensures fast redirects, security, and cloud scalability for high-traffic use.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
