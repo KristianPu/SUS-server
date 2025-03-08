@@ -1,15 +1,16 @@
-import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const showSwagger = !(configService.get('NODE_ENV') === 'prod');
-  const baseUrl = configService.get('BASE_URL');
+
+  const showSwagger = !(configService.get<string>('NODE_ENV') === 'prod');
+  const baseUrl = configService.get<string>('BASE_URL');
 
   if (baseUrl) app.setGlobalPrefix(baseUrl);
 
@@ -31,6 +32,6 @@ async function bootstrap() {
       document,
     );
   }
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get<number>('PORT') ?? 3000);
 }
 bootstrap();

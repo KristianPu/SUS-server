@@ -1,9 +1,9 @@
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { validate } from './config/env';
 
 import { UrlShortenerModule } from './url-shortener/url-shortener.module';
-import { ConfigModule } from '@nestjs/config';
+import { validate } from './config/env';
 
 @Module({
   imports: [
@@ -12,16 +12,12 @@ import { ConfigModule } from '@nestjs/config';
       cache: true,
       validate,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'root',
-      database: 'mandm',
-      entities: [],
-      synchronize: true,
-      autoLoadEntities: true,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
     }),
     UrlShortenerModule,
   ],

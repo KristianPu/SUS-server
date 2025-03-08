@@ -21,16 +21,7 @@ export class EnvironmentVariables {
   BASE_URL: string;
 
   @IsString()
-  DB_USER: string;
-
-  @IsString()
-  DB_PASS: string;
-
-  @IsNumber()
-  DB_PORT: number;
-
-  @IsString()
-  DB_NAME: string;
+  MONGODB_URI: string;
 
   @IsString()
   JWT_SECRET: string;
