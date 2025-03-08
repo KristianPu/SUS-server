@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UrlShortenerService {}
+export class UrlShortenerService {
+  constructor() {}
+
+  async create() {}
+}
