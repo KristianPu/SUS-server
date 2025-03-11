@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Url } from '../schemas/url.schema';
+import { Url } from './schema/url.schema';
 import { ShortenUrlDto } from './dto/shorten-url.dto';
 
 @Injectable()
