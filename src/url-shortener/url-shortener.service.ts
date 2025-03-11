@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,21 +11,19 @@ export class UrlShortenerService {
   constructor(@InjectModel(Url.name) private urlModel: Model<Url>) {}
 
   async createShortUrl(shortenUrlDto: ShortenUrlDto) {
-    const { originalUrl } = shortenUrlDto;
-    const base = 'basetext';
+    const { url, shrotenUrlBase } = shortenUrlDto;
     const urlId = nanoid();
 
-    const validateUrl = !this.validateUrl(originalUrl);
-    console.log(validateUrl);
+    if (!this.isValidUrl(url)) return new BadRequestException('Invalid url');
 
     try {
-      let url = await this.urlModel.findOne({ originalUrl }).exec();
-      if (url) return url;
+      const currentUrl = await this.urlModel.findOne({ url }).exec();
+      if (currentUrl) return currentUrl;
 
-      const shortUrl = `${base}/${urlId}`;
+      const shortUrl = `${shrotenUrlBase}/${urlId}`;
       return new this.urlModel({
         urlId,
-        originalUrl,
+        url,
         shortUrl,
         clicks: 0,
       }).save();
@@ -34,21 +32,20 @@ export class UrlShortenerService {
     }
   }
 
-  async getUrl(urlId: string): Promise<string> {
+  async getUrl(originalUrl: string): Promise<Url> {
     try {
-      const url = await this.urlModel.findOne({ urlId });
+      const url = await this.urlModel.findOne({ originalUrl }).exec();
       if (url) {
-        await url.updateOne({ urlId }, { $inc: { clicks: 1 } });
-        return url.originalUrl;
+        return await url.updateOne({ originalUrl }, { $inc: { clicks: 1 } });
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  validateUrl(url: string) {
-    return new RegExp(
-      '/^(?:(?:(?:https?|ftp):)?\\/\\/)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))(?::\\d{2,5})?(?:[/?#]\\S*)?$/i',
-    ).test(url);
+  isValidUrl(url: string) {
+    return /^(http(s):\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g.test(
+      url,
+    );
   }
 }

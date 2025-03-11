@@ -5,5 +5,10 @@ export class ShortenUrlDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  originalUrl: string;
+  url: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  shrotenUrlBase: string;
 }

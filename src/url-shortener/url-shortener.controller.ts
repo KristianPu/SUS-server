@@ -13,7 +13,9 @@ export class UrlShortenerController {
   }
 
   @Get(':id')
-  getUrl(@Param('id') id: string) {
-    return this.urlShortenerService.getUrl(id);
+  async getUrl(@Param('id') id: string) {
+    const url = await this.urlShortenerService.getUrl(id);
+    console.log(url);
+    return url;
   }
 }
