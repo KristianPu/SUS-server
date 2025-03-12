@@ -8,14 +8,12 @@ export class UrlShortenerController {
   constructor(private readonly urlShortenerService: UrlShortenerService) {}
 
   @Post()
-  shorten(@Body() shortenUrlDto: ShortenUrlDto) {
-    return this.urlShortenerService.createShortUrl(shortenUrlDto);
+  async shortenUrl(@Body() shortenUrlDto: ShortenUrlDto) {
+    return await this.urlShortenerService.createShortUrl(shortenUrlDto);
   }
 
   @Get(':id')
   async getUrl(@Param('id') id: string) {
-    const url = await this.urlShortenerService.getUrl(id);
-    console.log(url);
-    return url;
+    return await this.urlShortenerService.getUrl(id);
   }
 }

@@ -2,12 +2,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppModule } from './app.module';
+import { LoggerInterceptor } from './interceptors/logger.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
 
   const showSwagger = !(configService.get<string>('NODE_ENV') === 'prod');
   const baseUrl = configService.get<string>('BASE_URL');
@@ -32,6 +35,16 @@ async function bootstrap() {
       document,
     );
   }
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalInterceptors(new LoggerInterceptor(logger, configService));
+
   await app.listen(configService.get<number>('PORT') ?? 3000);
 }
 bootstrap();

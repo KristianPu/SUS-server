@@ -31,6 +31,12 @@ export class EnvironmentVariables {
 
   @IsNumber()
   SALT: number;
+
+  @IsString()
+  LOG_LEVEL: string;
+
+  @IsString()
+  EXCLUDE_PROPERTIES: string;
 }
 
 export function validate(config: Record<string, unknown>) {

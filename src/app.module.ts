@@ -1,6 +1,8 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
+import { utilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 import { UrlShortenerModule } from './url-shortener/url-shortener.module';
 import { validate } from './config/env';
@@ -12,6 +14,22 @@ import { validate } from './config/env';
       cache: true,
       validate,
     }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.ms(),
+            utilities.format.nestLike('SUS-server', {
+              colors: true,
+              prettyPrint: true,
+              processId: true,
+              appName: true,
+            }),
+          ),
+        }),
+      ],
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -22,6 +40,6 @@ import { validate } from './config/env';
     UrlShortenerModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [Logger],
 })
 export class AppModule {}
