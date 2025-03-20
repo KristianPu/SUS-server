@@ -4,7 +4,7 @@ import { Logger, Module } from '@nestjs/common';
 import { utilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 
-import { UrlShortenerModule } from './url-shortener/url-shortener.module';
+import { UrlShortenerModule } from './modules/url-shortener/url-shortener.module';
 import { validate } from './config/env';
 
 @Module({
