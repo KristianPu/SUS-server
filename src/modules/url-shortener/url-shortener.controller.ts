@@ -12,8 +12,8 @@ export class UrlShortenerController {
     return await this.urlShortenerService.createShortUrl(shortenUrlDto);
   }
 
-  @Get(':id')
-  async getUrl(@Param('id') id: string) {
-    return await this.urlShortenerService.getUrl(id);
+  @Get(':url')
+  async getUrl(@Param('url') url: string) {
+    return await this.urlShortenerService.getUrl(url);
   }
 }

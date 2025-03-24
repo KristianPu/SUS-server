@@ -1,43 +1,40 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { UrlShortenerController } from './url-shortener.controller';
 import { UrlShortenerService } from './url-shortener.service';
-import { Url, UrlSchema } from './schema/url.schema';
-import { validate } from '../../config/env';
 
 describe('UrlShortenerController', () => {
   let controller: UrlShortenerController;
 
   const mockUrlShortenerService = {
     createShortUrl: jest.fn((dto) => {
-      return {};
+      const urlId = '123456789';
+      return {
+        urlId,
+        originalUrl: dto.url,
+        shortUrl: `${dto.shrotenUrlBase}/${urlId}`,
+        clicks: 0,
+        dateCreated: new Date(),
+      };
+    }),
+    getUrl: jest.fn((url) => {
+      return {
+        urlId: '123456789',
+        originalUrl: url,
+        shortUrl: 'testBase/123456789',
+        clicks: 0,
+        dateCreated: new Date(),
+      };
     }),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          cache: true,
-          validate,
-        }),
-        MongooseModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: (configService: ConfigService) => ({
-            uri: configService.get<string>('MONGODB_URI'),
-          }),
-          inject: [ConfigService],
-        }),
-        MongooseModule.forFeature([{ name: Url.name, schema: UrlSchema }]),
-      ],
       controllers: [UrlShortenerController],
       providers: [UrlShortenerService],
     })
-      // .overrideProvider(UrlShortenerService)
-      // .useValue(mockUrlShortenerService)
+      .overrideProvider(UrlShortenerService)
+      .useValue(mockUrlShortenerService)
       .compile();
 
     controller = module.get<UrlShortenerController>(UrlShortenerController);
@@ -47,12 +44,28 @@ describe('UrlShortenerController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create shortened url', () => {
+  it('should create shortened url', async () => {
     expect(
-      controller.shortenUrl({
+      await controller.shortenUrl({
         url: 'https://www.youtube.com/',
         shrotenUrlBase: 'testBase',
       }),
-    ).toMatch(/^testBase\/[a-zA-Z0-9_-]{21}$/);
+    ).toEqual({
+      urlId: expect.any(String),
+      originalUrl: 'https://www.youtube.com/',
+      shortUrl: 'testBase/123456789',
+      clicks: 0,
+      dateCreated: expect.any(Date),
+    });
+  });
+
+  it('should get url', async () => {
+    expect(await controller.getUrl('https://www.youtube.com/')).toEqual({
+      urlId: expect.any(String),
+      originalUrl: 'https://www.youtube.com/',
+      shortUrl: 'testBase/123456789',
+      clicks: 0,
+      dateCreated: expect.any(Date),
+    });
   });
 });
