@@ -6,6 +6,8 @@ import * as winston from 'winston';
 
 import { UrlShortenerModule } from './modules/url-shortener/url-shortener.module';
 import { validate } from './config/env';
+import { UserModule } from './modules/user/user.module';
+import { JwtGlobalModule } from './guards/jwt.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { validate } from './config/env';
       inject: [ConfigService],
     }),
     UrlShortenerModule,
+    UserModule,
+    JwtGlobalModule,
   ],
   controllers: [],
   providers: [Logger],
