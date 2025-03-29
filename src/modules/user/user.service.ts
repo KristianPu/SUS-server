@@ -18,28 +18,38 @@ export class UserService {
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<Partial<User>> {
-    const existingUser = await this.userModel.findOne({
-      where: { email: createUserDto.email },
-    });
-    if (existingUser) {
+    if (!/\S+@\S+\.\S+/.test(createUserDto.email)) {
+      throw new BadRequestException('Invalid email');
+    }
+
+    const existingUser = await this.userModel
+      .find({
+        email: createUserDto.email,
+      })
+      .exec();
+
+    if (existingUser[0]) {
       throw new BadRequestException(
         `User with email ${createUserDto.email} already exists`,
       );
     }
+
     const salt = Number(this.configService.get<number>('SALT'));
     createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
 
     const user = await this.userModel.create(createUserDto);
-    const { password, ...userWithoutPassword } = user;
-
+    const { __v, _id, password, ...userWithoutPassword } = user['_doc'];
     await user.save();
 
     return userWithoutPassword;
   }
 
+  // TODO: Add refresh token and expiration
   async login(loginUserDto: LoginUserDto): Promise<{ token: string }> {
     const { email, password } = loginUserDto;
-    const user = await this.userModel.findOne({ where: { email } });
+    const users = await this.userModel.find({ email }).exec();
+    const user = users[0];
+
     if (!user)
       throw new BadRequestException(`User with email ${email} not found`);
 

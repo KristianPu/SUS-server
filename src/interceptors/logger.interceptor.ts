@@ -47,7 +47,6 @@ export class LoggerInterceptor implements NestInterceptor {
         loggedUser: LoggedUser = JSON.parse(
           Buffer.from(token.split('.')[1], 'base64').toString(),
         );
-
       userIdLog += loggedUser.userId;
     } catch (error) {
       userIdLog += ' unindentified';

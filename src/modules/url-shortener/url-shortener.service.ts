@@ -12,7 +12,7 @@ export class UrlShortenerService {
 
   async createShortUrl(shortenUrlDto: ShortenUrlDto) {
     const { url, shrotenUrlBase } = shortenUrlDto;
-    const urlId = nanoid();
+    const urlHash = nanoid();
 
     if (!this.isValidUrl(url)) return new BadRequestException('Invalid url');
 
@@ -20,9 +20,8 @@ export class UrlShortenerService {
       const currentUrl = await this.urlModel.findOne({ url }).exec();
       if (currentUrl) return currentUrl;
 
-      const shortUrl = `${shrotenUrlBase}/${urlId}`;
+      const shortUrl = `${shrotenUrlBase}/${urlHash}`;
       return new this.urlModel({
-        urlId,
         url,
         shortUrl,
         clicks: 0,
