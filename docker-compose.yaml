@@ -1,0 +1,43 @@
+services:
+  sus-server:
+    build: .
+    image: sus-server
+    environment:
+      - MONGODB_URL=${MONGODB_URI}
+    ports:
+      - '8085:8085'
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/src
+    networks:
+      - node-network
+    restart: always
+
+  mongodb-dev:
+    image: mongo:6.0-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+    networks:
+      - node-network
+    restart: always
+
+  mongodb-test:
+    image: mongo:6.0-jammy
+    ports:
+      - '27018:27017'
+    volumes:
+      - dbdata6-test:/data/db
+    networks:
+      - node-network
+    restart: always
+
+volumes:
+  dbdata6:
+  dbdata6-test:
+
+networks:
+  node-network:
+    driver: bridge

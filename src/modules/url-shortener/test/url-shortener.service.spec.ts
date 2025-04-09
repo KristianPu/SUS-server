@@ -3,8 +3,8 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BadRequestException } from '@nestjs/common';
 
-import { UrlShortenerService } from './url-shortener.service';
-import { Url } from './schema/url.schema';
+import { UrlShortenerService } from '../url-shortener.service';
+import { Url } from '../schema/url.schema';
 
 jest.mock('nanoid', () => ({
   nanoid: () => '123abc',

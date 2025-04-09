@@ -6,8 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
-import { UserService } from './user.service';
-import { User } from './schema/user.schema';
+import { UserService } from '../user.service';
+import { User } from '../schema/user.schema';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
@@ -39,7 +39,7 @@ describe('UserService', () => {
   beforeEach(async () => {
     const mockModel = {
       find: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue([]), // default to no existing user
+        exec: jest.fn().mockResolvedValue([]),
       }),
       create: jest.fn().mockImplementation((dto) => ({
         _doc: {
@@ -133,12 +133,10 @@ describe('UserService', () => {
         password: 'hashedPassword',
       };
 
-      // Return a valid user so it passes the 'not found' check
       (model.find as jest.Mock).mockReturnValueOnce({
         exec: jest.fn().mockResolvedValue([mockUser]),
       });
 
-      // But password check fails
       (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
 
       const promise = service.login(dto);
