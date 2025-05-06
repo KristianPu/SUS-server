@@ -8,6 +8,7 @@ import { UrlShortenerModule } from './modules/url-shortener/url-shortener.module
 import { validate } from './config/env';
 import { UserModule } from './modules/user/user.module';
 import { JwtGlobalModule } from './guards/jwt.module';
+import { LinkDetailModule } from './modules/link-detail/link-detail.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { JwtGlobalModule } from './guards/jwt.module';
     }),
     UrlShortenerModule,
     UserModule,
+    LinkDetailModule,
     JwtGlobalModule,
   ],
   controllers: [],
