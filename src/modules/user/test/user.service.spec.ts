@@ -20,14 +20,6 @@ const mockUser = {
   password: 'hashedPassword',
 };
 
-const mockUserModel = {
-  find: jest
-    .fn()
-    .mockReturnValue({ exec: jest.fn().mockResolvedValue([mockUser]) }),
-  create: jest.fn(),
-  save: jest.fn(),
-};
-
 const jwtServiceMock = {
   sign: jest.fn().mockReturnValue('token'),
 };
