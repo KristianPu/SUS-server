@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 import { UrlShortenerService } from './url-shortener.service';
 import { ShortenUrlDto } from './dto/shorten-url.dto';
@@ -12,8 +13,15 @@ export class UrlShortenerController {
     return await this.urlShortenerService.createShortUrl(shortenUrlDto);
   }
 
-  @Get(':url')
-  async getUrl(@Param('url') url: string) {
-    return await this.urlShortenerService.getUrl(url);
+  @Get(':urlHash')
+  async redirectToOriginalUrl(
+    @Param('urlHash') urlHash: string,
+    @Res() res: Response,
+  ) {
+    const url = await this.urlShortenerService.getUrl(urlHash);
+    if (!url) {
+      return res.status(404).send('URL not found');
+    }
+    return res.redirect(301, url.originalUrl);
   }
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { nanoid } from 'nanoid';
 import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 
 import { Url } from './schema/url.schema';
 import { ShortenUrlDto } from './dto/shorten-url.dto';
@@ -11,18 +11,19 @@ export class UrlShortenerService {
   constructor(@InjectModel(Url.name) private urlModel: Model<Url>) {}
 
   async createShortUrl(shortenUrlDto: ShortenUrlDto) {
-    const { url, shrotenUrlBase } = shortenUrlDto;
+    const { originalUrl, shrotenUrlBase } = shortenUrlDto;
     const urlHash = nanoid();
 
-    if (!this.isValidUrl(url)) return new BadRequestException('Invalid url');
+    if (!this.isValidUrl(originalUrl))
+      return new BadRequestException('Invalid url');
 
     try {
-      const currentUrl = await this.urlModel.findOne({ url }).exec();
+      const currentUrl = await this.urlModel.findOne({ originalUrl }).exec();
       if (currentUrl) return currentUrl;
 
-      const shortUrl = `${shrotenUrlBase}/${urlHash}`;
+      const shortUrl = `${shrotenUrlBase}-${urlHash}`;
       return new this.urlModel({
-        url,
+        originalUrl,
         shortUrl,
         clicks: 0,
       }).save();
@@ -31,12 +32,17 @@ export class UrlShortenerService {
     }
   }
 
-  async getUrl(originalUrl: string): Promise<Url> {
+  async getUrl(urlHash: string): Promise<Url> | null {
     try {
-      const url = await this.urlModel.findOne({ originalUrl }).exec();
+      const url = await this.urlModel.findOne({ shortUrl: urlHash }).exec();
+      console.log(url, '1', urlHash);
       if (url) {
-        return await url.updateOne({ originalUrl }, { $inc: { clicks: 1 } });
+        await url
+          .updateOne({ shortUrl: urlHash }, { $inc: { clicks: 1 } })
+          .exec();
+        return url;
       }
+      return null;
     } catch (error) {
       console.log(error);
     }
