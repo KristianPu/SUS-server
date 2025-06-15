@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BadRequestException } from '@nestjs/common';
 
 import { UrlShortenerService } from '../url-shortener.service';
 import { Url } from '../schema/url.schema';
@@ -66,14 +66,17 @@ describe('UrlShortenerService', () => {
 
   describe('createShortUrl', () => {
     it('should return BadRequestException for invalid URL', async () => {
-      const dto = { url: 'invalid-url', shrotenUrlBase: 'https://sho.rt' };
+      const dto = {
+        originalUrl: 'invalid-url',
+        shrotenUrlBase: 'https://sho.rt',
+      };
       const result = await service.createShortUrl(dto);
       expect(result).toBeInstanceOf(BadRequestException);
     });
 
     it('should return existing shortened URL if already exists', async () => {
       const dto = {
-        url: 'https://example.com',
+        originalUrl: 'https://example.com',
         shrotenUrlBase: 'https://sho.rt',
       };
       const existingUrl = { ...mockUrl };
@@ -92,7 +95,7 @@ describe('UrlShortenerService', () => {
       });
 
       const dto = {
-        url: 'https://example.com',
+        originalUrl: 'https://example.com',
         shrotenUrlBase: 'https://sho.rt',
       };
 

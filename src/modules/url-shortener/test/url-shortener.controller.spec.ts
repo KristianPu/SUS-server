@@ -47,7 +47,7 @@ describe('UrlShortenerController', () => {
   it('should create shortened url', async () => {
     expect(
       await controller.shortenUrl({
-        url: 'https://www.youtube.com/',
+        originalUrl: 'https://www.youtube.com/',
         shrotenUrlBase: 'testBase',
       }),
     ).toEqual({
@@ -60,7 +60,12 @@ describe('UrlShortenerController', () => {
   });
 
   it('should get url', async () => {
-    expect(await controller.getUrl('https://www.youtube.com/')).toEqual({
+    expect(
+      await controller.shortenUrl({
+        originalUrl: 'https://www.youtube.com/',
+        shrotenUrlBase: 'testBase',
+      }),
+    ).toEqual({
       urlId: expect.any(String),
       originalUrl: 'https://www.youtube.com/',
       shortUrl: 'testBase/123456789',
